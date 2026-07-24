@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robert Davis — Staff Site Reliability Engineer</title>
+<meta name="description" content="Staff SRE with 10+ years building cloud-native infrastructure — and a specialty in building SRE practices, not just systems.">
+<style>
+  :root {
+    --ink: #17171a;
+    --sub: #6b6b73;
+    --faint: #94949c;
+    --line: #e9e9ee;
+    --chip: #f5f5f8;
+    --accent: #3b64d8;
+    --accent-soft: #eef2fc;
+    --live: #22a06b;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 28px;
+    background: rgba(255,255,255,.82);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s;
+  }
+  .topbar.scrolled { border-bottom-color: var(--line); }
+  .topbar .brand { font-weight: 650; font-size: 14px; letter-spacing: -0.01em; color: var(--ink); }
+  .topbar .links { display: flex; gap: 20px; font-size: 13.5px; }
+
+  .col { max-width: 960px; margin: 0 auto; padding: 0 28px; }
+  .narrow { max-width: 700px; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 150px 0 64px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 650; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 16px;
+  }
+  h1 {
+    font-size: clamp(38px, 6vw, 58px); font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.06; margin: 0 0 20px; text-wrap: balance;
+  }
+  .thesis { font-size: 19px; color: var(--sub); max-width: 34em; margin: 0 0 28px; }
+  .thesis strong { color: var(--ink); font-weight: 650; }
+  .hero-links { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 56px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--line); color: var(--ink);
+    transition: border-color .2s, background .2s, transform .2s var(--ease);
+  }
+  .btn:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+  .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .btn.primary:hover { background: #000; }
+
+  .terminal {
+    background: #fbfbfd; border: 1px solid var(--line); border-radius: 14px;
+    font-family: var(--mono); font-size: 13.5px; line-height: 1.8;
+    padding: 18px 22px 20px; max-width: 640px;
+    box-shadow: 0 1px 2px rgba(20,20,40,.04), 0 12px 32px -18px rgba(20,20,40,.12);
+  }
+  .terminal .dots { display: flex; gap: 6px; margin-bottom: 14px; }
+  .terminal .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .terminal .out { white-space: pre-wrap; color: var(--sub); min-height: 8.6em; margin: 0; }
+  .terminal .out .p { color: var(--ink); font-weight: 600; }
+  .terminal .out .g { color: var(--live); }
+  .cursor { display: inline-block; width: 8px; height: 1.1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ---------- sections ---------- */
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--line); }
+  .sec-eyebrow {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--faint); margin: 0 0 10px;
+  }
+  h2 { font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; text-wrap: balance; }
+  .lede { color: var(--sub); font-size: 16.5px; max-width: 40em; margin: 0 0 40px; }
+
+  /* reveal */
+  .rv { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+  .rv.in { opacity: 1; transform: none; }
+
+  /* ---------- metrics ---------- */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  .metric { border: 1px solid var(--line); border-radius: 14px; padding: 22px 22px 18px; }
+  .metric b {
+    display: block; font-family: var(--mono); font-variant-numeric: tabular-nums;
+    font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .metric span { font-size: 13.5px; color: var(--sub); }
+
+  /* ---------- now ---------- */
+  .now-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .now-grid { grid-template-columns: 1fr; } }
+  .card {
+    border: 1px solid var(--line); border-radius: 16px; padding: 26px 26px 22px;
+    transition: box-shadow .3s var(--ease), transform .3s var(--ease);
+  }
+  .card:hover { box-shadow: 0 14px 40px -22px rgba(20,20,40,.18); transform: translateY(-2px); }
+  .card h3 { font-size: 18px; font-weight: 650; letter-spacing: -0.015em; margin: 0 0 4px; }
+  .card .where { font-size: 13px; color: var(--faint); margin: 0 0 14px; }
+  .card p { font-size: 14.5px; color: var(--sub); margin: 0 0 12px; }
+  .card ul { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--sub); }
+  .card li { margin-bottom: 7px; }
+  .card li strong, .card p strong { color: var(--ink); font-weight: 600; }
+  .live {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 650; color: var(--live);
+    background: #edf7f2; border-radius: 999px; padding: 3px 11px; margin-bottom: 12px;
+  }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: pulse 2s var(--ease) infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,160,107,.4);} 50% { box-shadow: 0 0 0 6px rgba(34,160,107,0);} }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 650; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px; padding: 3px 11px; margin-bottom: 12px;
+  }
+
+  /* ---------- principles ---------- */
+  .prin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
+  .prin { border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .prin h3 { font-size: 15.5px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .prin p { font-size: 14px; color: var(--sub); margin: 0; }
+
+  /* ---------- timeline ---------- */
+  .timeline { position: relative; padding-left: 34px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px;
+    background: var(--line); border-radius: 2px;
+  }
+  .timeline .fill {
+    position: absolute; left: 8px; top: 6px; width: 2px; height: 0;
+    background: var(--accent); border-radius: 2px; transition: height .2s linear;
+  }
+  .entry { position: relative; padding-bottom: 46px; }
+  .entry:last-child { padding-bottom: 6px; }
+  .entry::before {
+    content: ""; position: absolute; left: -31px; top: 7px; width: 10px; height: 10px;
+    border-radius: 50%; background: #fff; border: 2px solid var(--faint);
+    transition: border-color .4s, background .4s;
+  }
+  .entry.in::before { border-color: var(--accent); background: var(--accent-soft); }
+  .entry .when { font-family: var(--mono); font-size: 12.5px; color: var(--faint); margin: 0 0 4px; }
+  .entry h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.015em; margin: 0; }
+  .entry .org { color: var(--sub); font-weight: 500; }
+  .entry .headline { font-size: 15px; color: var(--ink); margin: 10px 0 10px; max-width: 44em; }
+  .entry ul { margin: 0; padding-left: 18px; color: var(--sub); font-size: 14.5px; max-width: 44em; }
+  .entry li { margin-bottom: 7px; }
+  .entry li strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- built ---------- */
+  .built-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
+  .built-grid .card h3 a { color: var(--ink); }
+  .built-grid .card h3 a:hover { color: var(--accent); text-decoration: none; }
+  .arrow { color: var(--accent); font-weight: 600; font-size: 13.5px; }
+
+  /* ---------- skills ---------- */
+  .skills { display: flex; flex-wrap: wrap; gap: 8px; max-width: 760px; }
+  .skills span {
+    font-size: 13px; font-weight: 550; color: var(--sub);
+    background: var(--chip); border-radius: 999px; padding: 5px 13px;
+  }
+
+  footer { border-top: 1px solid var(--line); padding: 56px 0 72px; }
+  footer .col { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; align-items: baseline; }
+  footer p { margin: 0; color: var(--sub); font-size: 14px; }
+  footer .links { display: flex; gap: 20px; font-size: 14px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .rv { opacity: 1; transform: none; transition: none; }
+    .cursor, .live i { animation: none; }
+    .card, .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <span class="brand">Robert Davis</span>
+  <span class="links">
+    <a href="https://github.com/rahb3rt">GitHub</a>
+    <a href="https://linkedin.com/in/rahb3rt">LinkedIn</a>
+    <a href="mailto:robert@quarx.co">Email</a>
+  </span>
+</div>
+
+<header class="hero">
+  <div class="col">
+    <p class="eyebrow rv">Staff Site Reliability Engineer · New Haven, CT</p>
+    <h1 class="rv">I build SRE practices,<br>not just systems.</h1>
+    <p class="thesis rv">10+ years building cloud-native infrastructure. Founded the SRE function from zero at Away — a Heroku-to-AWS migration with <strong>zero customer-facing downtime</strong> — and now driving the formation of a formal SRE practice across ServiceNow's cloud platform organization.</p>
+    <div class="hero-links rv">
+      <a class="btn primary" href="mailto:robert@quarx.co">Get in touch</a>
+      <a class="btn" href="https://rahb3rt.github.io/platform-architecture">Live architecture &amp; postmortem</a>
+      <a class="btn" href="https://github.com/rahb3rt">github.com/rahb3rt</a>
+    </div>
+    <div class="terminal rv" aria-hidden="true">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <pre class="out" id="term"></pre>
+    </div>
+  </div>
+</header>
+
+<section id="impact">
+  <div class="col">
+    <p class="sec-eyebrow rv">Impact</p>
+    <h2 class="rv">Numbers that shipped</h2>
+    <div class="metrics">
+      <div class="metric rv"><b><span class="count" data-to="2000">0</span>+</b><span>engineers in the cloud platform org where the SRE practice is forming</span></div>
+      <div class="metric rv"><b><span class="count" data-to="300">0</span>+</b><span>SREs using the SLO/SLI standards and burn-rate alerting</span></div>
+      <div class="metric rv"><b>2h → <span class="count" data-to="5">0</span>min</b><span>deploy time after rebuilding delivery on GitOps</span></div>
+      <div class="metric rv"><b><span class="count" data-to="75">0</span>%</b><span>cut in environment provisioning time via self-service Terraform</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="now">
+  <div class="col">
+    <p class="sec-eyebrow rv">Now</p>
+    <h2 class="rv">What I'm working on</h2>
+    <p class="lede rv">Two tracks: forming an SRE practice at organizational scale, and operating a production platform solo — each keeps the other honest.</p>
+    <div class="now-grid">
+      <div class="card rv">
+        <span class="badge">ServiceNow · Cloud Platform</span>
+        <h3>Forming a formal SRE practice</h3>
+        <p class="where">2,000+ engineers · AWS, GCP, Azure &amp; company-operated datacenters</p>
+        <ul>
+          <li><strong>Operating model &amp; standards</strong> — defining what SRE means for the org: reliability standards teams self-assess against, and an adoption roadmap that meets teams where they are.</li>
+          <li><strong>Error-budget reliability</strong> — Google SRE-style SLO/SLI practices with burn-rate alerting, in active use by 300+ SREs.</li>
+          <li><strong>Multi-tenant Kubernetes</strong> — reference patterns for self-healing, isolation, and fault tolerance that teams copy rather than reinvent.</li>
+          <li><strong>AIOps-assisted triage</strong> — incident workflows that start the on-call at a hypothesis instead of a raw page.</li>
+        </ul>
+      </div>
+      <div class="card rv">
+        <span class="live"><i></i>In production</span>
+        <h3>Independent engineering</h3>
+        <p class="where">15-service platform · designed, built &amp; operated solo since 2023</p>
+        <ul>
+          <li><strong><span class="count" data-to="16000">0</span>+ jobs</strong>, <strong><span class="count" data-to="5100">0</span>+ invoices</strong>, and <strong><span class="count" data-to="58000">0</span>+ telemetry readings</strong> processed — invoicing, payments, e-sign, scheduling, payroll.</li>
+          <li><strong>60 domains / 520 endpoints</strong> on the core API, with a passwordless customer portal.</li>
+          <li><strong>Isolated per-customer stacks</strong> — own networks, volumes, secrets, hourly backups — evolving into multi-tenant SaaS via a control plane.</li>
+          <li><strong>Reliability tooling built in-house</strong> — health aggregation with Docker auto-discovery, SLO dashboard, and a public postmortem.</li>
+        </ul>
+        <p style="margin-top:14px"><a class="arrow" href="https://rahb3rt.github.io/platform-architecture">Architecture, metrics &amp; postmortem →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="col">
+    <p class="sec-eyebrow rv">How I work</p>
+    <h2 class="rv">Operating principles</h2>
+    <p class="lede rv">Patterns that repeat across every practice I've built — from a two-person startup function to a 2,000-engineer organization.</p>
+    <div class="prin-grid">
+      <div class="prin rv"><h3>Paved roads, not mandates</h3><p>Adoption happens when the right way is the easy way. Reference implementations teams can copy beat standards documents nobody reads.</p></div>
+      <div class="prin rv"><h3>Alert on symptoms, not causes</h3><p>Page a human only when users are hurting or a budget is burning. Every page that leads to no action gets fixed or deleted.</p></div>
+      <div class="prin rv"><h3>Error budgets over arguments</h3><p>Reliability as a budgeted, negotiable quantity gives product and engineering a shared currency — the ship-vs-fix debate becomes arithmetic.</p></div>
+      <div class="prin rv"><h3>Prove it with chaos</h3><p>DR that hasn't been exercised is a theory. Failover paths, PDBs, and multi-region claims get validated continuously, before customers do it for you.</p></div>
+      <div class="prin rv"><h3>Blameless by design</h3><p>The moment a person gets named as a root cause, the org stops telling itself the truth. Timelines are written from the system's point of view.</p></div>
+      <div class="prin rv"><h3>Automate the toil, keep the people</h3><p>The engineers who know where the bodies are buried should write the automation. Nobody gets automated out — they get promoted into it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="past">
+  <div class="col">
+    <p class="sec-eyebrow rv">Past</p>
+    <h2 class="rv">Where the practice was built</h2>
+    <div class="timeline" id="timeline">
+      <div class="fill" id="tfill"></div>
+
+      <div class="entry rv">
+        <p class="when">Dec 2023 — Present</p>
+        <h3>Staff Site Reliability Engineer <span class="org">· ServiceNow</span></h3>
+        <p class="headline">Driving SRE practice formation across a 2,000+ engineer cloud platform organization — multi-cloud and on-prem.</p>
+        <ul>
+          <li>SLO/SLI/SLA standards adopted by <strong>300+ SREs</strong>; ad-hoc alerting replaced with burn-rate–driven, error-budget-based reliability management.</li>
+          <li>Partnering with engineering leadership to transform an operations team into an <strong>engineering organization</strong> — multi-region Kubernetes with DR, multi-AZ databases, chaos engineering, per-branch test environments.</li>
+          <li>Technical lead for cross-organizational re-architecture spanning engineering, product, and security; mentoring senior engineers into reliability roles.</li>
+        </ul>
+      </div>
+
+      <div class="entry rv">
+        <p class="when">Apr 2022 — Dec 2023</p>
+        <h3>Staff Site Reliability Engineer <span class="org">· Away</span></h3>
+        <p class="headline">Founded the SRE practice from scratch — charter, hiring, on-call, roadmap — then led the full Heroku-to-AWS migration with zero customer-facing downtime.</p>
+        <ul>
+          <li>Step-change in flagship e-commerce availability: <strong>multi-region Kubernetes, automated failover and DR, multi-AZ databases</strong> — validated continuously via chaos engineering.</li>
+          <li>Deploys cut from <strong>2 hours to under 5 minutes</strong> on GitHub Actions + Argo CD; same-day production releases for every team.</li>
+          <li>Provisioning time down <strong>75%</strong> with self-service Terraform modules and per-branch test environments.</li>
+          <li>Introduced observability from scratch (Datadog, PagerDuty); hired the founding SREs and wrote the career progression framework.</li>
+        </ul>
+      </div>
+
+      <div class="entry rv">
+        <p class="when">May 2021 — Mar 2022</p>
+        <h3>Lead Site Reliability Engineer <span class="org">· MedAllies</span></h3>
+        <p class="headline">Migrated the company's entire HIPAA-regulated healthcare platform from on-prem VMware to GCP — its first production GKE footprint.</p>
+        <ul>
+          <li>Fully containerized every workload — cutting operating costs and unlocking elastic scaling for clinical services.</li>
+          <li>Established <strong>Terraform + Ansible</strong> as the IaC standard across every environment, eliminating configuration drift.</li>
+          <li>Introduced GitOps delivery (Argo CD) and built the on-call, alerting, and incident response program from nothing.</li>
+        </ul>
+      </div>
+
+      <div class="entry rv">
+        <p class="when">Jul 2019 — Jan 2021</p>
+        <h3>Manager, DevOps <span class="org">· NuEnergen</span></h3>
+        <p class="headline">Cost-optimized AWS infrastructure for high-throughput energy-data APIs; deploys lifted from weekly to on-demand.</p>
+        <ul>
+          <li>Led Bitbucket-to-GitHub migration and SDLC standardization; owned on-call for revenue-impacting data flows.</li>
+          <li>Managed a distributed engineering team and embedded DevSecOps — image scanning, secrets management, IAM hardening — into delivery.</li>
+        </ul>
+      </div>
+
+      <div class="entry rv">
+        <p class="when">2013 — 2021</p>
+        <h3>Earlier chapters</h3>
+        <ul>
+          <li><strong>Senior Software Engineer, Clarus Commerce</strong> — SDLC ownership and architecture reviews on a commerce platform.</li>
+          <li><strong>Director of Software Engineering, InveniAI</strong> — led a globally distributed team of 10+; built ML model deployment pipelines for pharmaceutical R&amp;D, years before "MLOps" had a name.</li>
+          <li><strong>Software Engineer, Prometheus Research</strong> — Python/PostgreSQL backends and FHIR-compliant REST APIs for healthcare interoperability.</li>
+          <li><strong>IT Engineer, Fairfield University</strong> — hardware, networking, and security operations. Where the reliability instinct started: racks, cables, and what actually fails.</li>
+        </ul>
+      </div>
+
+      <div class="entry rv">
+        <p class="when">Education</p>
+        <h3>B.S. Physics &amp; Mathematics <span class="org">· Fairfield University</span></h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="built">
+  <div class="col">
+    <p class="sec-eyebrow rv">Built</p>
+    <h2 class="rv">Published work</h2>
+    <p class="lede rv">Production systems with the receipts public — architecture, metrics, security posture, and a postmortem.</p>
+    <div class="built-grid">
+      <div class="card rv">
+        <h3><a href="https://rahb3rt.github.io/platform-architecture">Platform architecture</a></h3>
+        <p>Live documentation of the 15-service platform — diagrams, production metrics, security posture, and a public postmortem held to professional incident standards.</p>
+        <a class="arrow" href="https://rahb3rt.github.io/platform-architecture">rahb3rt.github.io/platform-architecture →</a>
+      </div>
+      <div class="card rv">
+        <h3><a href="https://github.com/rahb3rt/container-health-aggregator">Container health aggregator</a></h3>
+        <p>In-house reliability tooling: health aggregation with Docker auto-discovery feeding a monitoring dashboard with SLO tracking.</p>
+        <a class="arrow" href="https://github.com/rahb3rt/container-health-aggregator">View on GitHub →</a>
+      </div>
+      <div class="card rv">
+        <h3><a href="https://github.com/rahb3rt/fleet-telemetry">Fleet telemetry</a></h3>
+        <p>ESP32 OBD-II/GPS vehicle telemetry, engineered store-and-forward for unreliable connectivity — 58,000+ readings and counting. Embedded C++ to cloud API, one pair of hands.</p>
+        <a class="arrow" href="https://github.com/rahb3rt/fleet-telemetry">View on GitHub →</a>
+      </div>
+      <div class="card rv">
+        <h3><a href="https://github.com/rahb3rt/compose-multienv-deploy">Multi-env deploy tooling</a></h3>
+        <p>One-command, multi-environment deploys — production, staging, and isolated per-customer stacks — shipped multi-arch to GHCR.</p>
+        <a class="arrow" href="https://github.com/rahb3rt/compose-multienv-deploy">View on GitHub →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="col">
+    <p class="sec-eyebrow rv">Toolbox</p>
+    <h2 class="rv">Technical skills</h2>
+    <div class="skills rv">
+      <span>Kubernetes (EKS/GKE)</span><span>Docker</span><span>Helm</span><span>Istio</span><span>Multi-tenant cluster design</span>
+      <span>AWS</span><span>GCP</span><span>Terraform</span><span>Ansible</span>
+      <span>GitHub Actions</span><span>GitLab CI</span><span>Argo CD</span><span>GitOps</span><span>Progressive delivery</span>
+      <span>Datadog</span><span>Prometheus</span><span>Grafana</span><span>OpenTelemetry</span><span>SLI/SLO &amp; error budgets</span><span>Incident response</span><span>HA/DR</span>
+      <span>Python</span><span>Go</span><span>Bash</span><span>SQL</span><span>TypeScript</span><span>C++ (embedded)</span>
+      <span>PostgreSQL</span><span>MySQL</span><span>Redis</span><span>Kafka</span><span>BigQuery</span>
+      <span>HIPAA</span><span>SOC 2</span><span>HashiCorp Vault</span><span>IAM/RBAC</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="col">
+    <p>Robert Oktawian Davis · New Haven, CT</p>
+    <span class="links">
+      <a href="mailto:robert@quarx.co">robert@quarx.co</a>
+      <a href="https://github.com/rahb3rt">GitHub</a>
+      <a href="https://linkedin.com/in/rahb3rt">LinkedIn</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // top bar hairline on scroll
+  var bar = document.getElementById('topbar');
+  addEventListener('scroll', function () {
+    bar.classList.toggle('scrolled', scrollY > 8);
+  }, { passive: true });
+
+  // scroll reveals + counters
+  var counted = new WeakSet();
+  function runCount(el) {
+    var to = +el.dataset.to, dur = 900, t0 = null;
+    function step(t) {
+      if (!t0) t0 = t;
+      var k = Math.min((t - t0) / dur, 1);
+      k = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * k).toLocaleString('en-US');
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      e.target.querySelectorAll('.count').forEach(function (c) {
+        if (counted.has(c)) return;
+        counted.add(c);
+        if (reduced) { c.textContent = (+c.dataset.to).toLocaleString('en-US'); }
+        else runCount(c);
+      });
+      io.unobserve(e.target);
+    });
+  }, { threshold: 0.18 });
+  document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+  if (reduced) document.querySelectorAll('.count').forEach(function (c) {
+    c.textContent = (+c.dataset.to).toLocaleString('en-US');
+  });
+
+  // timeline line fill on scroll
+  var tl = document.getElementById('timeline'), fill = document.getElementById('tfill');
+  function drawLine() {
+    var r = tl.getBoundingClientRect();
+    var visible = Math.min(Math.max(innerHeight * 0.75 - r.top, 0), r.height - 12);
+    fill.style.height = visible + 'px';
+  }
+  if (reduced) { fill.style.height = 'calc(100% - 12px)'; }
+  else { addEventListener('scroll', drawLine, { passive: true }); drawLine(); }
+
+  // hero terminal typing
+  var lines = [
+    { text: '$ whoami', cls: 'p' },
+    { text: 'staff site-reliability engineer — 10+ yrs cloud-native infrastructure', cls: '' },
+    { text: '$ kubectl get practices --all-namespaces', cls: 'p' },
+    { text: 'NAMESPACE     STATUS    NOTES', cls: '' },
+    { text: 'away          Founded   heroku→aws, zero customer-facing downtime', cls: 'g' },
+    { text: 'servicenow    Scaling   slo standards in use by 300+ sres', cls: 'g' }
+  ];
+  var term = document.getElementById('term');
+  if (reduced) {
+    term.innerHTML = lines.map(function (l) {
+      return '<span class="' + l.cls + '">' + l.text + '</span>';
+    }).join('\n');
+  } else {
+    var li = 0, ci = 0, buf = '';
+    var cursor = '<span class="cursor"></span>';
+    function type() {
+      if (li >= lines.length) { term.innerHTML = buf + cursor; return; }
+      var l = lines[li];
+      if (ci === 0 && li > 0) buf += '\n';
+      if (ci < l.text.length) {
+        ci++;
+        var open = l.cls ? '<span class="' + l.cls + '">' : '';
+        var close = l.cls ? '</span>' : '';
+        term.innerHTML = buf + open + l.text.slice(0, ci) + close + cursor;
+        setTimeout(type, l.cls === 'p' ? 34 : 7);
+      } else {
+        buf += (l.cls ? '<span class="' + l.cls + '">' + l.text + '</span>' : l.text);
+        li++; ci = 0;
+        setTimeout(type, l.cls === 'p' ? 260 : 60);
+      }
+    }
+    setTimeout(type, 500);
+  }
+})();
+</script>
+</body>
+</html>
