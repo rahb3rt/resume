@@ -114,7 +114,7 @@
   .terminal .bar span { margin-left: 8px; font-size: 11px; color: var(--faint); letter-spacing: .04em; }
   .terminal .out {
     display: block; white-space: pre; overflow-x: auto; overscroll-behavior-x: contain;
-    color: var(--sub); height: 10.8em; margin: 0;
+    color: var(--sub); height: 27em; margin: 0;
   }
   .terminal .out .p { color: var(--ink); font-weight: 600; }
   .terminal .out .g { color: var(--live); }
@@ -353,7 +353,7 @@
     </div>
     <div class="terminal rv">
       <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>robert@quarx — zsh</span></div>
-      <pre class="out" id="term" aria-label="Terminal: staff site-reliability engineer, 10+ years cloud-native infrastructure. SRE practices founded at Away, scaling at ServiceNow."></pre>
+      <pre class="out" id="term" aria-label="Terminal: staff site-reliability engineer, 10+ years cloud-native infrastructure. Career as kubectl output: Fairfield (origin), Prometheus Research, InveniAI, NuEnergen, Clarus, MedAllies, Away (founded SRE, zero-downtime Heroku to AWS), ServiceNow (scaling SLO standards to 300+ SREs), and the quarx platform running solo."></pre>
     </div>
   </div>
 </header>
@@ -723,10 +723,18 @@
   var lines = [
     { text: '$ whoami', cls: 'p' },
     { text: 'staff site-reliability engineer — 10+ yrs cloud-native infrastructure', cls: '' },
-    { text: '$ kubectl get practices --all-namespaces', cls: 'p' },
-    { text: 'NAMESPACE     STATUS    NOTES', cls: '' },
-    { text: 'away          Founded   heroku→aws, zero customer-facing downtime', cls: 'g' },
-    { text: 'servicenow    Scaling   slo standards in use by 300+ sres', cls: 'g' }
+    { text: '$ kubectl get practices -A --sort-by=.metadata.creationTimestamp', cls: 'p' },
+    { text: 'NAMESPACE    STATUS    AGE    NOTES', cls: '' },
+    { text: 'fairfield    Origin    2y     racks, cables, what actually fails', cls: '' },
+    { text: 'prometheus   Shipped   1y     fhir apis for healthcare interop', cls: '' },
+    { text: 'inveniai     Led       2y7m   ml deploy pipelines for pharma r&d', cls: '' },
+    { text: 'nuenergen    Managed   18mo   weekly→on-demand deploys on aws', cls: '' },
+    { text: 'clarus       Shipped   5mo    commerce platform architecture', cls: '' },
+    { text: 'medallies    Migrated  10mo   hipaa vmware→gcp, first prod gke', cls: '' },
+    { text: 'away         Founded   20mo   heroku→aws, zero customer-facing downtime', cls: 'g' },
+    { text: 'servicenow   Scaling   2y7m   slo standards in use by 300+ sres', cls: 'g' },
+    { text: 'quarx        Running   3y+    15-service platform, operated solo', cls: 'g' },
+    { text: '$ ', cls: 'p' }
   ];
   var term = document.getElementById('term');
   function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
@@ -743,11 +751,11 @@
       if (ci < l.text.length) {
         ci++;
         term.innerHTML = buf + span(l, l.text.slice(0, ci)) + cursor;
-        setTimeout(type, l.cls === 'p' ? 34 : 7);
+        setTimeout(type, l.cls === 'p' ? 34 : 5);
       } else {
         buf += span(l, l.text);
         li++; ci = 0;
-        setTimeout(type, l.cls === 'p' ? 260 : 60);
+        setTimeout(type, l.cls === 'p' ? 260 : 45);
       }
     }
     setTimeout(type, 500);
