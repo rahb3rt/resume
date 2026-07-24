@@ -38,9 +38,10 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  body.drawer-open { overflow: hidden; }
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
   ::selection { background: var(--accent-soft); }
 
   /* ---------- top bar ---------- */
@@ -63,9 +64,7 @@
     transition: color .2s, background .2s; white-space: nowrap;
   }
   .topbar nav a:hover { color: var(--ink); background: var(--chip); text-decoration: none; }
-  .topbar nav a.cta {
-    color: #fff; background: var(--ink); font-weight: 600; margin-left: 6px;
-  }
+  .topbar nav a.cta { color: #fff; background: var(--ink); font-weight: 600; margin-left: 6px; }
   .topbar nav a.cta:hover { background: #000; }
   @media (max-width: 719px) { .topbar nav a.seclink { display: none; } }
 
@@ -130,27 +129,38 @@
     font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
     color: var(--faint); margin: 0 0 10px;
   }
-  h2 { font-size: clamp(25px, 4vw, 30px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; text-wrap: balance; scroll-margin-top: 72px; }
+  h2 { font-size: clamp(25px, 4vw, 30px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; text-wrap: balance; }
   section[id] { scroll-margin-top: 56px; }
-  .lede { color: var(--sub); font-size: 16.5px; max-width: 40em; margin: 0 0 40px; }
+  .lede { color: var(--sub); font-size: 16.5px; max-width: 42em; margin: 0 0 40px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
 
   /* reveal */
   .rv { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
   .rv.in { opacity: 1; transform: none; }
 
-  /* ---------- metrics ---------- */
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
-  .metric {
-    border: 1px solid var(--line); border-radius: 14px; padding: 22px 22px 18px;
-    transition: border-color .3s;
+  /* ---------- stats strip ---------- */
+  .stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border-top: 1px solid var(--line);
   }
-  .metric:hover { border-color: #d8dcea; }
-  .metric b {
+  .stat { padding: 28px 24px 24px 0; border-bottom: 1px solid var(--line); }
+  .stat b {
     display: block; font-family: var(--mono); font-variant-numeric: tabular-nums;
-    font-size: clamp(26px, 3.4vw, 32px); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px;
-    white-space: nowrap;
+    font-size: clamp(40px, 5.5vw, 56px); font-weight: 600; letter-spacing: -0.04em;
+    line-height: 1; margin-bottom: 10px; white-space: nowrap;
   }
-  .metric span { font-size: 13.5px; color: var(--sub); }
+  .stat b .sfx { font-size: .5em; font-weight: 600; color: var(--accent); letter-spacing: -0.01em; }
+  .stat b .pre { font-size: .5em; font-weight: 600; color: var(--faint); letter-spacing: -0.01em; }
+  .stat span { font-size: 13.5px; color: var(--sub); display: block; max-width: 24em; }
+  @media (min-width: 820px) {
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .stat { border-bottom: none; padding: 32px 28px 8px; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat:first-child { padding-left: 0; }
+  }
+  @media (max-width: 819px) {
+    .stat:nth-child(even) { padding-left: 24px; border-left: 1px solid var(--line); }
+  }
 
   /* ---------- cards ---------- */
   .now-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
@@ -210,11 +220,70 @@
   .entry .when { font-family: var(--mono); font-size: 12.5px; color: var(--faint); margin: 0 0 4px; letter-spacing: .01em; }
   .entry h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
   .entry .org { color: var(--sub); font-weight: 500; }
-  .entry .headline { font-size: 15px; color: var(--ink); margin: 10px 0 10px; max-width: 44em; }
-  .entry ul { margin: 0; padding-left: 18px; color: var(--sub); font-size: 14.5px; max-width: 44em; }
-  .entry li { margin-bottom: 7px; }
-  .entry li::marker { color: var(--faint); }
-  .entry li strong { color: var(--ink); font-weight: 600; }
+  .entry .headline { font-size: 15px; color: var(--ink); margin: 10px 0 6px; max-width: 44em; }
+  .entry ul.plain { margin: 0; padding-left: 18px; color: var(--sub); font-size: 14.5px; max-width: 44em; }
+  .entry ul.plain li { margin-bottom: 7px; }
+  .entry ul.plain li::marker { color: var(--faint); }
+  .entry strong { color: var(--ink); font-weight: 600; }
+
+  /* fold-out bullets */
+  ul.folds { list-style: none; margin: 4px 0 0; padding: 0; max-width: 46em; }
+  ul.folds li { margin: 0; }
+  .fold {
+    display: flex; width: 100%; gap: 14px; justify-content: space-between; align-items: baseline;
+    text-align: left; font: inherit; font-size: 14.5px; line-height: 1.55; color: var(--sub);
+    background: none; border: 0; border-radius: 10px; padding: 9px 12px; margin: 0 0 2px -12px;
+    cursor: pointer; transition: background .2s, color .2s;
+  }
+  .fold:hover { background: var(--chip); color: var(--ink); }
+  .fold .chev { color: var(--accent); font-weight: 650; font-size: 13px; flex-shrink: 0; white-space: nowrap; transition: transform .2s var(--ease); }
+  .fold:hover .chev { transform: translateX(3px); }
+  .how-link {
+    display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 10px;
+    font: inherit; font-size: 13.5px; font-weight: 600; color: var(--accent);
+    background: none; border: 0; padding: 0; cursor: pointer;
+  }
+  .how-link:hover { text-decoration: underline; }
+
+  /* ---------- drawer ---------- */
+  .scrim {
+    position: fixed; inset: 0; z-index: 20; background: rgba(23,23,26,.35);
+    opacity: 0; pointer-events: none; transition: opacity .4s var(--ease);
+  }
+  body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 30;
+    width: min(480px, 100vw); background: #fff;
+    border-left: 1px solid var(--line);
+    box-shadow: -32px 0 80px -40px rgba(20,20,40,.35);
+    transform: translateX(105%); transition: transform .45s var(--ease);
+    overflow-y: auto; overscroll-behavior: contain;
+    padding: 26px 32px 44px;
+  }
+  body.drawer-open .drawer { transform: none; }
+  .drawer .d-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+  .d-kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .d-close {
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: #fff;
+    font-size: 15px; line-height: 1; color: var(--sub); cursor: pointer; flex-shrink: 0;
+    transition: background .2s, color .2s;
+  }
+  .d-close:hover { background: var(--chip); color: var(--ink); }
+  .drawer h3 { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; margin: 0 0 18px; text-wrap: balance; }
+  .d-lbl {
+    display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--faint); margin: 20px 0 6px;
+  }
+  .drawer p { font-size: 14.5px; color: var(--sub); line-height: 1.65; margin: 0 0 10px; }
+  .drawer p strong, .drawer li strong { color: var(--ink); font-weight: 600; }
+  .drawer ul { margin: 0 0 10px; padding-left: 18px; font-size: 14.5px; color: var(--sub); line-height: 1.65; }
+  .drawer li { margin-bottom: 6px; }
+  .drawer li::marker { color: var(--faint); }
+  .d-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+  .d-chips span {
+    font-family: var(--mono); font-size: 12px; font-weight: 550; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px; padding: 4px 12px;
+  }
 
   /* ---------- built ---------- */
   .built-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; align-items: stretch; }
@@ -233,7 +302,6 @@
   }
   .skills span:hover { border-color: var(--line); color: var(--ink); }
 
-  /* ---------- footer ---------- */
   footer { border-top: 1px solid var(--line); padding: 56px 0 72px; }
   footer .col { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; align-items: baseline; }
   footer p { margin: 0; color: var(--sub); font-size: 14px; }
@@ -244,14 +312,18 @@
     .rv { opacity: 1; transform: none; transition: none; }
     .cursor, .live i { animation: none; }
     .card, .btn, .metric, .prin, .entry::before { transition: none; }
+    .drawer { transition: none; }
+    .scrim { transition: none; }
   }
   @media print {
-    .topbar, .terminal, .hero::before { display: none; }
+    .topbar, .terminal, .hero::before, .scrim, .drawer { display: none; }
     .hero { padding-top: 24px; }
     section { padding: 24px 0; }
     .rv { opacity: 1; transform: none; }
-    .card, .metric, .prin { break-inside: avoid; }
+    .card, .stat, .prin { break-inside: avoid; }
     a { color: var(--ink); }
+    .fold { padding-left: 0; }
+    .fold .chev { display: none; }
   }
 </style>
 </head>
@@ -290,11 +362,12 @@
   <div class="col">
     <p class="sec-eyebrow rv">Impact</p>
     <h2 class="rv">Numbers that shipped</h2>
-    <div class="metrics">
-      <div class="metric rv"><b><span class="count" data-to="2000">0</span>+</b><span>engineers in the cloud platform org where the SRE practice is forming</span></div>
-      <div class="metric rv"><b><span class="count" data-to="300">0</span>+</b><span>SREs using the SLO/SLI standards and burn-rate alerting</span></div>
-      <div class="metric rv"><b>2h → &lt;<span class="count" data-to="5">0</span>min</b><span>deploy time after rebuilding delivery on GitOps</span></div>
-      <div class="metric rv"><b>−<span class="count" data-to="75">0</span>%</b><span>environment provisioning time via self-service Terraform</span></div>
+    <p class="lede rv">Measured outcomes, not aspirations — each one is expanded in the experience section below.</p>
+    <div class="stats rv">
+      <div class="stat"><b><span class="count" data-to="2000">0</span><span class="sfx">+</span></b><span>engineers in the cloud platform org where the SRE practice is forming</span></div>
+      <div class="stat"><b><span class="count" data-to="300">0</span><span class="sfx">+</span></b><span>SREs using the SLO/SLI standards and burn-rate alerting</span></div>
+      <div class="stat"><b><span class="pre">&lt;</span><span class="count" data-to="5">0</span><span class="sfx">min</span></b><span>deploy time — down from 2 hours — after rebuilding delivery on GitOps</span></div>
+      <div class="stat"><b><span class="count" data-to="75">0</span><span class="sfx">%</span></b><span>cut in environment provisioning time via self-service Terraform</span></div>
     </div>
   </div>
 </section>
@@ -352,6 +425,7 @@
   <div class="col">
     <p class="sec-eyebrow rv">Past</p>
     <h2 class="rv">Where the practice was built</h2>
+    <p class="lede rv"><strong>Every bullet unfolds.</strong> Click one and the how — approach, examples of the work, what shipped — slides in from the right.</p>
     <div class="timeline" id="timeline">
       <div class="fill" id="tfill"></div>
 
@@ -359,10 +433,10 @@
         <p class="when">Dec 2023 — Present</p>
         <h3>Staff Site Reliability Engineer <span class="org">· ServiceNow</span></h3>
         <p class="headline">Driving SRE practice formation across a 2,000+ engineer cloud platform organization — multi-cloud and on-prem.</p>
-        <ul>
-          <li>SLO/SLI/SLA standards adopted by <strong>300+ SREs</strong>; ad-hoc alerting replaced with burn-rate–driven, error-budget-based reliability management.</li>
-          <li>Partnering with engineering leadership to transform an operations team into an <strong>engineering organization</strong> — multi-region Kubernetes with DR, multi-AZ databases, chaos engineering, per-branch test environments.</li>
-          <li>Technical lead for cross-organizational re-architecture spanning engineering, product, and security; mentoring senior engineers into reliability roles.</li>
+        <ul class="folds">
+          <li><button class="fold" data-d="sn-slo"><span>SLO/SLI/SLA standards adopted by <strong>300+ SREs</strong> — burn-rate alerting and error-budget-based reliability replacing ad-hoc practice.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="sn-eng"><span>Partnering with leadership to turn an operations team into an <strong>engineering organization</strong> — multi-region Kubernetes, DR, chaos engineering, per-branch environments.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="sn-lead"><span>Technical lead for <strong>cross-organizational re-architecture</strong> spanning engineering, product, and security; mentoring senior engineers into reliability roles.</span><span class="chev">How →</span></button></li>
         </ul>
       </div>
 
@@ -370,11 +444,13 @@
         <p class="when">Apr 2022 — Dec 2023</p>
         <h3>Staff Site Reliability Engineer <span class="org">· Away</span></h3>
         <p class="headline">Founded the SRE practice from scratch — charter, hiring, on-call, roadmap — then led the full Heroku-to-AWS migration with zero customer-facing downtime.</p>
-        <ul>
-          <li>Step-change in flagship e-commerce availability: <strong>multi-region Kubernetes, automated failover and DR, multi-AZ databases</strong> — validated continuously via chaos engineering.</li>
-          <li>Deploys cut from <strong>2 hours to under 5 minutes</strong> on GitHub Actions + Argo CD; same-day production releases for every team.</li>
-          <li>Provisioning time down <strong>75%</strong> with self-service Terraform modules and per-branch test environments.</li>
-          <li>Introduced observability from scratch (Datadog, PagerDuty); hired the founding SREs and wrote the career progression framework.</li>
+        <button class="how-link" data-d="away-mig">How the migration stayed invisible →</button>
+        <ul class="folds">
+          <li><button class="fold" data-d="away-avail"><span>Step-change in e-commerce availability: <strong>multi-region Kubernetes, automated failover and DR, multi-AZ databases</strong> — validated continuously via chaos engineering.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="away-deploy"><span>Deploys cut from <strong>2 hours to under 5 minutes</strong> on GitHub Actions + Argo CD; same-day production releases for every team.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="away-env"><span>Provisioning time down <strong>75%</strong> with self-service Terraform modules and per-branch test environments.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="away-obs"><span>Introduced <strong>observability from scratch</strong> — Datadog, PagerDuty — cutting resolution times while improving the on-call experience.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="away-team"><span>Hired the <strong>founding SREs</strong> and wrote the career progression framework for the function.</span><span class="chev">How →</span></button></li>
         </ul>
       </div>
 
@@ -382,10 +458,10 @@
         <p class="when">May 2021 — Mar 2022</p>
         <h3>Lead Site Reliability Engineer <span class="org">· MedAllies</span></h3>
         <p class="headline">Migrated the company's entire HIPAA-regulated healthcare platform from on-prem VMware to GCP — its first production GKE footprint.</p>
-        <ul>
-          <li>Fully containerized every workload — cutting operating costs and unlocking elastic scaling for clinical services.</li>
-          <li>Established <strong>Terraform + Ansible</strong> as the IaC standard across every environment, eliminating configuration drift.</li>
-          <li>Introduced GitOps delivery (Argo CD) and built the on-call, alerting, and incident response program from nothing.</li>
+        <ul class="folds">
+          <li><button class="fold" data-d="med-hipaa"><span>Fully containerized <strong>every workload</strong> under HIPAA constraints — cutting operating costs and unlocking elastic scaling for clinical services.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="med-iac"><span>Established <strong>Terraform + Ansible</strong> as the IaC standard across every environment, eliminating configuration drift.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="med-oncall"><span>Built <strong>GitOps delivery and the incident response program</strong> — rotation, alerting, cross-functional response — from nothing.</span><span class="chev">How →</span></button></li>
         </ul>
       </div>
 
@@ -393,16 +469,16 @@
         <p class="when">Jul 2019 — Jan 2021</p>
         <h3>Manager, DevOps <span class="org">· NuEnergen</span></h3>
         <p class="headline">Cost-optimized AWS infrastructure for high-throughput energy-data APIs; deploys lifted from weekly to on-demand.</p>
-        <ul>
-          <li>Led Bitbucket-to-GitHub migration and SDLC standardization; owned on-call for revenue-impacting data flows.</li>
-          <li>Managed a distributed engineering team and embedded DevSecOps — image scanning, secrets management, IAM hardening — into delivery.</li>
+        <ul class="folds">
+          <li><button class="fold" data-d="nue-sdlc"><span>Led <strong>Bitbucket-to-GitHub migration</strong> and SDLC standardization; owned on-call for revenue-impacting data flows.</span><span class="chev">How →</span></button></li>
+          <li><button class="fold" data-d="nue-sec"><span>Managed a distributed team and embedded <strong>DevSecOps</strong> — image scanning, secrets management, IAM hardening — into delivery.</span><span class="chev">How →</span></button></li>
         </ul>
       </div>
 
       <div class="entry rv">
         <p class="when">2013 — 2021</p>
         <h3>Earlier chapters</h3>
-        <ul>
+        <ul class="plain">
           <li><strong>Senior Software Engineer, Clarus Commerce</strong> — SDLC ownership and architecture reviews on a commerce platform.</li>
           <li><strong>Director of Software Engineering, InveniAI</strong> — led a globally distributed team of 10+; built ML model deployment pipelines for pharmaceutical R&amp;D, years before "MLOps" had a name.</li>
           <li><strong>Software Engineer, Prometheus Research</strong> — Python/PostgreSQL backends and FHIR-compliant REST APIs for healthcare interoperability.</li>
@@ -475,17 +551,127 @@
   </div>
 </footer>
 
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title">
+  <div class="d-top">
+    <span class="d-kicker" id="d-kicker"></span>
+    <button class="d-close" id="d-close" aria-label="Close panel">✕</button>
+  </div>
+  <h3 id="d-title"></h3>
+  <div id="d-body"></div>
+</aside>
+
 <script>
 (function () {
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // top bar hairline on scroll
+  /* ---------- drawer content ---------- */
+  var D = {
+    'sn-slo': { k: 'ServiceNow', t: 'SLO standards adopted by 300+ SREs', h:
+      '<span class="d-lbl">Situation</span><p>A 2,000+ engineer cloud platform org where alerting had grown ad-hoc and cause-based — thresholds on CPU and disk, pages that didn’t map to user impact, and reliability debates with no shared vocabulary to settle them.</p>' +
+      '<span class="d-lbl">What I did</span><p>Built the SLO/SLI framework and made it the org standard: service-level indicators measured where users experience the service, targets negotiated with the owning teams, and <strong>multi-window burn-rate alerting</strong> — fast burns page, slow burns become tickets — replacing static thresholds.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Started with one willing team and shipped a complete reference implementation before publishing any standard — the standard describes something that already works here, not theory.</li><li>Error budgets made reliability a negotiable quantity: product and SRE share one currency for the ship-features-vs-fix-reliability decision.</li><li>Adoption by paved road: the SLO tooling is less work than maintaining ad-hoc alerts, so teams opt in.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>300+ SREs on standard</span><span>burn-rate paging</span><span>error budgets</span></div>' },
+    'sn-eng': { k: 'ServiceNow', t: 'Ops team → engineering organization', h:
+      '<span class="d-lbl">Situation</span><p>A function operating reactively — ticket by ticket, incident by incident — on infrastructure that made proactive engineering nearly impossible.</p>' +
+      '<span class="d-lbl">What I did</span><p>Partnered with engineering leadership on a new technical foundation chosen so the day job becomes engineering: <strong>multi-region Kubernetes with DR, multi-AZ database architectures, chaos engineering, and per-branch test environments</strong>.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Designed the <strong>multi-tenant Kubernetes reference implementation</strong> — isolation via quotas, network policy, and node pools; self-healing via disruption budgets and correctly built probes — that teams copy as they adopt the practice.</li><li>Chaos engineering introduced as a progression: game days first, then production experiments with blast-radius limits and automatic abort conditions tied to SLOs.</li><li>Reskilling by pairing: ops engineers build the automation with SREs — the people who know where the bodies are buried write the fixes.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>multi-region K8s + DR</span><span>chaos engineering</span><span>per-branch envs</span></div>' },
+    'sn-lead': { k: 'ServiceNow', t: 'Cross-org technical leadership', h:
+      '<span class="d-lbl">What I did</span><p>Technical lead for a re-architecture of legacy infrastructure spanning <strong>engineering, product, and security</strong> — three functions with different incentives, where the work is architecture and negotiation in equal parts.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Decision criteria agreed <em>before</em> debating decisions — what we optimize for, what’s non-negotiable — so disagreements resolve against shared rules instead of louder voices.</li><li>Trade-offs written up as decision records with the losing concern and its mitigation stated honestly; teams commit because the process is legible.</li><li>Mentoring senior engineers into reliability roles: own an SLO end-to-end, shadow then reverse-shadow on-call, co-lead real incidents.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>eng + product + security aligned</span><span>decision records</span><span>SRE talent pipeline</span></div>' },
+    'away-mig': { k: 'Away', t: 'Heroku → AWS with zero customer-facing downtime', h:
+      '<span class="d-lbl">Situation</span><p>Heroku was the right early choice and the wrong scaling one: cost at scale, limited network control, and no path to the multi-region architecture the flagship e-commerce platform needed.</p>' +
+      '<span class="d-lbl">What I did</span><p>Ran a criteria-driven platform evaluation — team skills, managed-service fit, cost structure, ecosystem — that selected AWS as primary, then led the full migration while simultaneously founding the SRE function: charter, hiring plan, on-call program.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Services migrated in sequence behind stable interfaces — old and new running in parallel, with data replicated continuously and verified before any cutover.</li><li>Cutovers staged at low-traffic windows with rehearsed, pre-built rollback — the goal was for the cutover to be the most boring moment of the migration.</li><li>“Zero customer-facing downtime” was defined before the work and measured from the customer’s side throughout: synthetic user flows, real-user monitoring, and edge error rates watched live at every cutover.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>0 customer-facing downtime</span><span>AWS primary</span><span>SRE function founded in parallel</span></div>' },
+    'away-avail': { k: 'Away', t: 'Availability as a tested behavior', h:
+      '<span class="d-lbl">What I did</span><p>Removed the single points of failure — <strong>multi-region Kubernetes, automated failover, multi-AZ database topologies</strong> — and then made proving it continuous instead of aspirational.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Failover is an automated, rehearsed runbook: replica promotion, application repointing, and fencing of the old primary so split-brain can’t take writes.</li><li>Chaos engineering validates the claims continuously — failure is injected deliberately, with hypotheses written first, so weaknesses surface in experiments rather than outages.</li><li>E-commerce framing kept the investment honest: downtime is directly lost revenue, so every reliability investment had a business case.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>multi-region</span><span>automated DR</span><span>chaos-validated</span></div>' },
+    'away-deploy': { k: 'Away', t: '2-hour deploys → under 5 minutes', h:
+      '<span class="d-lbl">Situation</span><p>Two-hour deploys meant batched changes, which meant every bad deploy was twenty commits to bisect — the slow pipeline was itself a reliability risk.</p>' +
+      '<span class="d-lbl">What I did</span><p>Rebuilt delivery end to end: GitHub Actions for CI, <strong>Argo CD pull-based GitOps</strong> for CD — a merge to main converges to production in minutes, and rollback becomes a git revert.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Human gates replaced with faster automated judgment: canary rollouts with metric gates against baseline, automatic rollback on SLO burn.</li><li>Database changes decoupled from deploys via expand-and-contract, so schema migrations never make a bad deploy un-rollback-able.</li><li>The outcome that mattered wasn’t the five minutes — it was every team shipping same-day, with smaller, safer changes.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>2h → &lt;5min</span><span>same-day releases</span><span>rollback = git revert</span></div>' },
+    'away-env': { k: 'Away', t: 'Provisioning −75%, environments per branch', h:
+      '<span class="d-lbl">What I did</span><p>Self-service <strong>Terraform modules</strong> turned infrastructure requests from tickets into pull requests, and <strong>per-branch test environments</strong> killed the queue for shared staging — where the multi-day waits actually lived.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Modules bake in what must be uniform — networking, IAM, encryption, tagging — and expose what teams legitimately vary. The easy path is the compliant path.</li><li>Environments are tied to the PR lifecycle: created on open, destroyed on merge, with a TTL sweeper for stragglers — cleanup is machinery, not memory.</li><li>Costs held down by minimum-viable sizing, scale-to-zero off hours, and per-team spend visibility.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>−75% provisioning time</span><span>env per branch</span><span>tickets → pull requests</span></div>' },
+    'away-obs': { k: 'Away', t: 'Observability from scratch', h:
+      '<span class="d-lbl">Situation</span><p>Before: debugging by SSH and guesswork. No metrics, no structured logs, no alerting worth the name.</p>' +
+      '<span class="d-lbl">What I did</span><p>Introduced metrics, logging, and alerting on <strong>Datadog</strong> with <strong>PagerDuty</strong> incident response — and rolled out alerting without creating the pager fatigue that usually comes with it.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>The paging rule: a page means a human must act <em>now</em> to protect users. Everything else is a ticket reviewed daily.</li><li>A standing alert-review ritual: any page that results in no action gets fixed or deleted — alert sets only grow unless something prunes them.</li><li>Cost governed like capacity: metric cardinality policies and log pipelines with sampling, so coverage grows instead of the bill.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>symptom-based paging</span><span>faster resolution</span><span>calmer on-call</span></div>' },
+    'away-team': { k: 'Away', t: 'Hiring the founding SREs', h:
+      '<span class="d-lbl">What I did</span><p>Hired and mentored the two founding SREs and wrote the <strong>career progression framework</strong> — defining what SRE means as a career at the company, so the function could grow without depending on its founder.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>The interview loop screened for systems thinking and incident temperament over tool checklists — a great engineer learns Datadog in a week; calm under pressure can’t be taught in one.</li><li>The ladder makes production ownership, incident leadership, and <em>toil elimination</em> first-class competencies — senior SREs are judged on what they’ve made unnecessary, not on heroics.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>2 founding SREs</span><span>career ladder</span><span>function outlived founder</span></div>' },
+    'med-hipaa': { k: 'MedAllies', t: 'Cloud-native under HIPAA', h:
+      '<span class="d-lbl">Situation</span><p>A HIPAA-regulated clinical platform on on-prem VMware — datacenter costs, no elastic scaling, and a compliance posture built around physical control.</p>' +
+      '<span class="d-lbl">What I did</span><p>Led the migration to GCP — the company’s <strong>first production GKE footprint</strong> — containerizing every workload, with compliance as a first-class workstream rather than a sign-off at the end.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Architecture constrained to BAA-covered services; encryption in transit and at rest throughout; audit logs shipped beyond operator reach; log scrubbing so PHI can’t leak through debug output.</li><li>Private clusters, segmented networks, and least-privilege identity made PHI isolation structural, not conventional.</li><li>Parity proven before cutover: parallel running with compared outputs and synthetic clinical transactions — for clinical systems the bar is demonstrated equivalence, because the failure mode is a provider not getting patient information.</li><li>Security and compliance were in the design reviews from day one, with every HIPAA safeguard mapped to a concrete control.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>first prod GKE</span><span>every workload containerized</span><span>lower opex, elastic scaling</span></div>' },
+    'med-iac': { k: 'MedAllies', t: 'Killing configuration drift', h:
+      '<span class="d-lbl">Situation</span><p>Dev, staging, and production had drifted apart by hand — “works in staging” failures were routine because no two environments were actually alike.</p>' +
+      '<span class="d-lbl">What I did</span><p>Made infrastructure-as-code the only path to change: <strong>Terraform</strong> for anything with a cloud API, <strong>Ansible</strong> for configuration inside VMs — a boundary designed to shrink as workloads containerized.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>Hand-built infrastructure imported incrementally: read-only plan runs first — the plan diff <em>is</em> the drift report — then deliberate reconciliation, then enforcement.</li><li>Environments became reproducible and diffable; “what’s different about prod?” became a question with an answer.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>dev = staging = prod</span><span>drift eliminated</span></div>' },
+    'med-oncall': { k: 'MedAllies', t: 'Incident response from nothing', h:
+      '<span class="d-lbl">What I did</span><p>Built the on-call rotation, OpsGenie alerting, and the incident response process where none existed — and personally led cross-functional response on customer-facing incidents.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>GitOps delivery (Argo CD + GitHub Actions) gave every team a self-service deploy path whose history doubles as the compliance audit trail — “who changed what, when” became a Git log.</li><li>Clinical customers raised the stakes on communication: incident comms discipline mattered as much as the fix, and every incident included a PHI-exposure assessment.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>on-call from zero</span><span>audit-ready delivery</span><span>cross-functional IC</span></div>' },
+    'nue-sdlc': { k: 'NuEnergen', t: 'One SDLC, reliability before the title', h:
+      '<span class="d-lbl">What I did</span><p>Led the Bitbucket-to-GitHub migration and standardized the SDLC — one workflow for everyone — then stood up production observability (CloudWatch, Kibana) on the data flows that paid the company, and took the pager for them personally.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>CI/CD on GitHub Actions and Docker lifted deploy frequency from weekly to on-demand — the early, smaller-stage version of the 2h→5min rebuild at Away.</li><li>Owning on-call for revenue-impacting flows meant reliability engineering before holding the SRE title — the title caught up to the job.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>weekly → on-demand</span><span>revenue flows observed</span></div>' },
+    'nue-sec': { k: 'NuEnergen', t: 'Security embedded in delivery', h:
+      '<span class="d-lbl">What I did</span><p>Managed a distributed engineering team and embedded <strong>DevSecOps into the pipeline itself</strong>: image scanning with severity thresholds that fail the build, secrets moved to managed storage with rotation, IAM tightened to least-privilege service roles.</p>' +
+      '<span class="d-lbl">How it worked</span><ul><li>The principle, carried everywhere since: a security control outside the delivery path gets bypassed under deadline pressure; a control inside the pipeline is just how software ships.</li></ul>' +
+      '<span class="d-lbl">Shipped</span><div class="d-chips"><span>scanning gates in CI</span><span>secrets managed + rotated</span><span>least-privilege IAM</span></div>' }
+  };
+
+  /* ---------- drawer machinery ---------- */
+  var drawer = document.getElementById('drawer'),
+      scrim = document.getElementById('scrim'),
+      dKicker = document.getElementById('d-kicker'),
+      dTitle = document.getElementById('d-title'),
+      dBody = document.getElementById('d-body'),
+      dClose = document.getElementById('d-close'),
+      lastFocus = null;
+  function openDrawer(key) {
+    var d = D[key];
+    if (!d) return;
+    dKicker.textContent = d.k;
+    dTitle.textContent = d.t;
+    dBody.innerHTML = d.h;
+    drawer.scrollTop = 0;
+    lastFocus = document.activeElement;
+    document.body.classList.add('drawer-open');
+    dClose.focus();
+  }
+  function closeDrawer() {
+    document.body.classList.remove('drawer-open');
+    if (lastFocus) { lastFocus.focus(); lastFocus = null; }
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-d]');
+    if (btn) { openDrawer(btn.dataset.d); }
+  });
+  dClose.addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) closeDrawer();
+  });
+
+  /* ---------- top bar hairline ---------- */
   var bar = document.getElementById('topbar');
   function onBar() { bar.classList.toggle('scrolled', scrollY > 8); }
   addEventListener('scroll', onBar, { passive: true });
   onBar();
 
-  // scroll reveals (staggered per batch) + counters
+  /* ---------- reveals + counters ---------- */
   var counted = new WeakSet();
   function runCount(el) {
     var to = +el.dataset.to, dur = 900, t0 = null;
@@ -523,7 +709,7 @@
   }, { threshold: 0.15, rootMargin: '0px 0px -5% 0px' });
   document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
 
-  // timeline line fill on scroll
+  /* ---------- timeline fill ---------- */
   var tl = document.getElementById('timeline'), fill = document.getElementById('tfill');
   function drawLine() {
     var r = tl.getBoundingClientRect();
@@ -533,7 +719,7 @@
   if (reduced) { fill.style.height = 'calc(100% - 12px)'; }
   else { addEventListener('scroll', drawLine, { passive: true }); addEventListener('resize', drawLine); drawLine(); }
 
-  // hero terminal typing
+  /* ---------- terminal ---------- */
   var lines = [
     { text: '$ whoami', cls: 'p' },
     { text: 'staff site-reliability engineer — 10+ yrs cloud-native infrastructure', cls: '' },
